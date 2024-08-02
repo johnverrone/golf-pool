@@ -6,6 +6,7 @@ import { getPicks } from './utils';
 export const load: PageServerLoad = async ({ params }) => {
 	try {
 		const data = await getPoolById(params.id);
+		// TODO: don't return picks to client before first tee time
 		return {
 			title: 'Golf Pools',
 			...data
@@ -23,6 +24,7 @@ export const actions = {
 		const pool = Number(data.get('pool') as string);
 		const teamName = data.get('team_name') as string;
 		const name = data.get('name') as string;
+		console.log(data);
 		const picks = getPicks(data);
 
 		// validate data

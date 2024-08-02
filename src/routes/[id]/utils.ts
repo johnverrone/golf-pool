@@ -6,7 +6,8 @@ export function getPicks(data: FormData): Entry['picks'] {
 	for (const [key, value] of data.entries()) {
 		// get players
 		if (/^tier-\d+-players$/.test(key)) {
-			const players = value as string;
+			let players = value as string;
+			players = players.replaceAll(/["[\]]/g, '');
 			picks.push(...players.split(','));
 		}
 	}

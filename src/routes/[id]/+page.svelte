@@ -3,11 +3,18 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
+	import { Switch } from '$lib/components/ui/switch';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
+	import * as Table from '$lib/components/ui/table';
 
 	let { data } = $props();
 	let open = $state(false);
+	let showPicks = $state(true);
+
+	let pickColumns = $derived([
+		...Array(Math.max(...data.entries.map((e) => e.picks?.length ?? 0))).keys()
+	]);
 </script>
 
 <Button href="/" variant="outline">back</Button>
@@ -17,12 +24,37 @@
 </div>
 
 <div class="my-6">
-	<h3>Entries</h3>
-	<ul>
-		{#each data.entries as entry}
-			<li class="my-4">{entry.teamName} - ({entry.name}) [{entry.picks?.length ?? 0}]</li>
-		{/each}
-	</ul>
+	<div class="flex justify-between">
+		<h3>Leaderboard</h3>
+		<div class="flex items-center space-x-2">
+			<Switch id="show-picks" bind:checked={showPicks} />
+			<Label for="show-picks">Show picks</Label>
+		</div>
+	</div>
+	<Table.Root class="table-fixed">
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>Team Name</Table.Head>
+				<Table.Head>Name</Table.Head>
+				{#each pickColumns as column}
+					<Table.Head>Pick {column + 1}</Table.Head>
+				{/each}
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each data.entries as entry}
+				<Table.Row>
+					<Table.Cell class="font-medium">{entry.teamName}</Table.Cell>
+					<Table.Cell>{entry.name}</Table.Cell>
+					{#if entry.picks}
+						{#each entry.picks as pick}
+							<Table.Cell>{showPicks ? pick : `~~~~~~`}</Table.Cell>
+						{/each}
+					{/if}
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
 </div>
 
 <Button variant="outline" onclick={() => (open = true)}>Add Entry</Button>
@@ -64,7 +96,7 @@
 					{#each [...data.tiers] as [tierNum, tier]}
 						<div class="grid grid-cols-4 items-center gap-4">
 							<Label for={`tier-${tierNum}-players`} class="text-right">Tier {tierNum}</Label>
-							<Select.Root multiple={tier.required > 1} portal={null}>
+							<Select.Root multiple={tier.required > 1}>
 								<Select.Trigger class="col-span-3">
 									<Select.Value
 										placeholder={tier.required > 1 ? 'Select players' : 'Select a player'}
