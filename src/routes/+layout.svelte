@@ -7,6 +7,6 @@
 	<title>{$page.data.title}</title>
 </svelte:head>
 
-<main class="p-10">
+<main class="p-4 md:p-10">
 	<slot></slot>
 </main>
