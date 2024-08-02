@@ -12,29 +12,35 @@ export type Database = {
       entries: {
         Row: {
           created_at: string
+          id: number
           name: string | null
           paid: boolean
-          pool: number
+          players: string[] | null
+          pool_id: number
           team_name: string
         }
         Insert: {
           created_at?: string
+          id?: number
           name?: string | null
           paid?: boolean
-          pool: number
+          players?: string[] | null
+          pool_id: number
           team_name: string
         }
         Update: {
           created_at?: string
+          id?: number
           name?: string | null
           paid?: boolean
-          pool?: number
+          players?: string[] | null
+          pool_id?: number
           team_name?: string
         }
         Relationships: [
           {
             foreignKeyName: "entries_pool_fkey"
-            columns: ["pool"]
+            columns: ["pool_id"]
             isOneToOne: false
             referencedRelation: "pools"
             referencedColumns: ["id"]

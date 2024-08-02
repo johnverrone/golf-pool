@@ -46,13 +46,13 @@
 			<input id="name" name="name" type="text" required />
 		</div>
 		{#if data.tiers}
-			{#each data.tiers as tier}
+			{#each [...data.tiers] as [tierNum, tier]}
 				<div>
-					<label for={`tier-${tier.tier_num}-players`}>Tier {tier.tier_num}</label>
+					<label for={`tier-${tierNum}-players`}>Tier {tierNum}</label>
 					<select
-						id={`tier-${tier.tier_num}-players`}
-						name={`tier-${tier.tier_num}-players`}
-						multiple={tier.required_picks > 1}
+						id={`tier-${tierNum}-players`}
+						name={`tier-${tierNum}-players`}
+						multiple={tier.required > 1}
 					>
 						<option value="">Select an option</option>
 						{#if tier.players}
@@ -74,6 +74,6 @@
 <h2>Entries</h2>
 <ul>
 	{#each data.entries as entry}
-		<li>{entry.team_name} - ({entry.name})</li>
+		<li>{entry.teamName} - ({entry.name}) [{entry.picks?.length ?? 0}]</li>
 	{/each}
 </ul>

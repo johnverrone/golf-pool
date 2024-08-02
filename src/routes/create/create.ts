@@ -1,11 +1,7 @@
-export interface TierInfo {
-	tier_num: number;
-	required_picks: number;
-	players: string[];
-}
+import type { Pool } from '$lib/api/pools';
 
-export function getTierInfo(data: FormData): TierInfo[] {
-	const tierArray: TierInfo[] = [];
+export function getTierInfo(data: FormData): Pool['tiers'] {
+	const tierMap: Pool['tiers'] = new Map();
 
 	for (const [key, value] of data.entries()) {
 		// get players
@@ -17,11 +13,11 @@ export function getTierInfo(data: FormData): TierInfo[] {
 				.map((v) => v.trim())
 				.filter((v) => v);
 
-			const t = tierArray.find((t) => t.tier_num === tier_num);
+			const t = tierMap.get(tier_num);
 			if (t) {
 				t.players = players;
 			} else {
-				tierArray.push({ tier_num, players, required_picks: 0 });
+				tierMap.set(tier_num, { players, required: 0 });
 			}
 		}
 
@@ -30,14 +26,14 @@ export function getTierInfo(data: FormData): TierInfo[] {
 			const tier_num = parseInt(key.at(5) ?? '', 10);
 			const required_picks = parseInt(value.toString(), 10);
 
-			const t = tierArray.find((t) => t.tier_num === tier_num);
+			const t = tierMap.get(tier_num);
 			if (t) {
-				t.required_picks = required_picks;
+				t.required = required_picks;
 			} else {
-				tierArray.push({ tier_num, required_picks, players: [] });
+				tierMap.set(tier_num, { required: required_picks, players: [] });
 			}
 		}
 	}
 
-	return tierArray;
+	return tierMap;
 }

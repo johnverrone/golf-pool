@@ -1,41 +1,46 @@
-import { supabase } from '$lib/supabaseClient';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { createEntry, getPoolById } from '$lib/api/pools';
+import { getPicks } from './utils';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const poolsQuery = await supabase.from('pools').select().eq('id', params.id).limit(1).single();
-	const entriesQuery = await supabase.from('entries').select().eq('pool', params.id);
-	const tiersQuery = await supabase.from('tiers').select().eq('pool_id', params.id);
-
-	if (poolsQuery.error || entriesQuery.error) {
+	try {
+		const data = await getPoolById(params.id);
+		return {
+			title: 'Golf Pools',
+			...data
+		};
+	} catch (err) {
+		console.error(err);
 		redirect(307, '/');
 	}
-
-	return {
-		...poolsQuery.data,
-		entries: entriesQuery.data,
-		tiers: tiersQuery.data
-	};
 };
 
 export const actions = {
 	createEntry: async ({ request }) => {
+		// parse form data
 		const data = await request.formData();
-		const pool = data.get('pool');
-		const team_name = data.get('team_name');
-		const name = data.get('name');
-		if (!pool || !team_name || !name) return fail(400, { missing: true });
-		const entryData = [
-			{
-				pool: parseInt(pool.toString(), 10),
-				team_name: team_name.toString(),
-				name: name.toString()
-			}
-		];
-		const { error } = await supabase.from('entries').insert(entryData);
-		if (error) {
-			return fail(500, { error, success: false });
+		const pool = Number(data.get('pool') as string);
+		const teamName = data.get('team_name') as string;
+		const name = data.get('name') as string;
+		const picks = getPicks(data);
+
+		// validate data
+		if (!pool) return fail(400, { name, missing: true });
+		if (!teamName) return fail(400, { teamName, missing: true });
+
+		try {
+			createEntry(pool, {
+				name,
+				teamName,
+				picks,
+				paid: false
+			});
+		} catch (err) {
+			return fail(500, { error: err });
 		}
+
+		// all is gucci, redirect to pool page
 		redirect(303, `/${pool}`);
 	}
 } satisfies Actions;
