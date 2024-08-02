@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.css';
 	import { page } from '$app/stores';
 </script>
 
@@ -6,4 +7,6 @@
 	<title>{$page.data.title}</title>
 </svelte:head>
 
-<slot />
+<main class="p-10">
+	<slot></slot>
+</main>

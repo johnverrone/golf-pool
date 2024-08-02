@@ -1,48 +1,46 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Textarea } from '$lib/components/ui/textarea';
 
 	let tierCount = $state(1);
 	let tiers = $derived([...Array(tierCount)].map((_, i) => i + 1));
 </script>
 
-<div>
-	<a href="/">back</a>
+<Button href="/" variant="outline">back</Button>
+<div class="my-6">
+	<h1>Create New Pool</h1>
+	<p class="text-muted-foreground">lfg</p>
 </div>
-
-<h2>Create New Pool</h2>
 
 <form method="POST" action="?/createPool" use:enhance>
 	<div>
-		<label for="name">Name</label>
-		<input id="name" type="text" name="name" required />
+		<Label for="name">Name</Label>
+		<Input id="name" type="text" name="name" required />
 	</div>
 	<div>
-		<label for="rules">Rules</label>
-		<textarea id="rules" name="rules" rows="10" cols="40"></textarea>
+		<Label for="rules">Rules</Label>
+		<Textarea id="rules" name="rules" />
 	</div>
-	<div>
-		<span>Enter one golfer per line</span>
-	</div>
-	{#each tiers as tier}
+	{#each tiers as tier, idx}
 		<div>
-			<p>Tier {tier}</p>
-			<label for={`tier-${tier}-players`}>Players</label>
-			<textarea
-				id={`tier-${tier}-players`}
-				name={`tier-${tier}-players`}
-				rows={Math.min(5 * tier, 40)}
-				cols="40"
-			></textarea>
-			<label for={`tier-${tier}-required`}># Required</label>
-			<input type="number" name={`tier-${tier}-required`} required />
+			<div class="grid grid-cols-4 gap-4">
+				<div class="col-span-3">
+					<Label for={`tier-${tier}-players`}>Tier {tier} Players</Label>
+					<Textarea id={`tier-${tier}-players`} name={`tier-${tier}-players`} />
+				</div>
+				<div>
+					<Label for={`tier-${tier}-required`}>No. Picks</Label>
+					<Input type="number" name={`tier-${tier}-required`} value={1} required />
+				</div>
+			</div>
+			{#if idx === 0}<p class="text-xs italic text-muted-foreground">One golfer per line</p>{/if}
 		</div>
 	{/each}
-	<div>
-		<button type="button" onclick={() => tierCount++}>Add tier</button>
-	</div>
-	<div>
-		<button>Create Pool</button>
-	</div>
+	<Button type="button" variant="outline" class="mt-2" onclick={() => tierCount++}>Add tier</Button>
+	<Button>Create Pool</Button>
 </form>
 
 <style lang="scss">
@@ -50,9 +48,5 @@
 		display: flex;
 		flex-flow: column;
 		gap: 8px;
-
-		textarea {
-			resize: vertical;
-		}
 	}
 </style>

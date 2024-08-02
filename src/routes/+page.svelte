@@ -1,11 +1,18 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+
 	let { data } = $props();
 </script>
 
-<h2>Pools</h2>
-<ul>
+<div>
+	<h1>Pools</h1>
+	<p class="text-muted-foreground">Manage your golf pools.</p>
+</div>
+
+<ul class="my-6 flex flex-col space-y-1">
 	{#each data.pools as pool}
-		<li><a href={`/${pool.id}`}>{pool.name}</a></li>
+		<li><Button href={`/${pool.id}`} variant="ghost">{pool.name}</Button></li>
 	{/each}
 </ul>
-<a href="/create">create pool</a>
+
+<Button href="/create">Create</Button>
