@@ -1,9 +1,15 @@
-import { supabase } from '$lib/supabaseClient';
+import { getPools } from '$lib/api/pools';
+import { fail } from '@sveltejs/kit';
 
 export async function load() {
-	const { data } = await supabase.from('pools').select();
-	return {
-		title: 'Golf Pools',
-		pools: data ?? []
-	};
+	try {
+		const pools = await getPools();
+		return {
+			title: 'Golf Pools',
+			pools
+		};
+	} catch (err) {
+		console.error(err);
+		fail(500);
+	}
 }

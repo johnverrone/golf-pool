@@ -13,7 +13,7 @@
 	let showPicks = $state(true);
 
 	let pickColumns = $derived([
-		...Array(Math.max(...data.entries.map((e) => e.picks?.length ?? 0))).keys()
+		...Array(Math.max(0, ...data.entries.map((e) => e.picks?.length ?? 0))).keys()
 	]);
 </script>
 
@@ -36,9 +36,11 @@
 			<Table.Row>
 				<Table.Head>Team Name</Table.Head>
 				<Table.Head>Name</Table.Head>
-				{#each pickColumns as column}
-					<Table.Head>Pick {column + 1}</Table.Head>
-				{/each}
+				{#if pickColumns.length}
+					{#each pickColumns as column}
+						<Table.Head>Pick {column + 1}</Table.Head>
+					{/each}
+				{/if}
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>

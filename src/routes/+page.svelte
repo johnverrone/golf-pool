@@ -10,9 +10,11 @@
 </div>
 
 <ul class="my-6 flex flex-col space-y-1">
-	{#each data.pools as pool}
-		<li><Button href={`/${pool.id}`} variant="ghost">{pool.name}</Button></li>
-	{/each}
+	{#if data.pools}
+		{#each data.pools as pool}
+			<li><Button href={`/${pool.id}`} variant="ghost">{pool.name}</Button></li>
+		{/each}
+	{/if}
 </ul>
 
 <Button href="/create">Create</Button>

@@ -14,15 +14,14 @@ export const actions = {
 		if (tiers.size < 1) return fail(400, { tiers, missing: true });
 
 		try {
-			createPool({
+			await createPool({
 				name,
 				tiers
 			});
+			// all is gucci, redirect home
+			redirect(303, '/');
 		} catch (err) {
 			return fail(500, { error: err });
 		}
-
-		// all is gucci, redirect home
-		redirect(303, '/');
 	}
 } satisfies Actions;

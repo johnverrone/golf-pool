@@ -12,7 +12,7 @@
 <Button href="/" variant="outline">back</Button>
 <div class="my-6">
 	<h1>Create New Pool</h1>
-	<p class="text-muted-foreground">lfg</p>
+	<p class="text-muted-foreground">Setup a new pool.</p>
 </div>
 
 <form method="POST" action="?/createPool" use:enhance>
@@ -40,13 +40,13 @@
 		</div>
 	{/each}
 	<Button type="button" variant="outline" class="mt-2" onclick={() => tierCount++}>Add tier</Button>
-	<Button>Create Pool</Button>
+	<Button type="submit">Create Pool</Button>
 </form>
 
 <style lang="scss">
 	form {
 		display: flex;
 		flex-flow: column;
-		gap: 8px;
+		gap: 16px;
 	}
 </style>

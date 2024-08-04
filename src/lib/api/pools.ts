@@ -24,12 +24,15 @@ export type PoolWithEntries = Pool & {
 	entries: Entry[];
 };
 
+// TYPE HELPERS
+type WithoutID<T> = Omit<T, 'id'>;
+
 // API
 
 /**
  * Create a new pool
  */
-export async function createPool(pool: Pool): Promise<true> {
+export async function createPool(pool: WithoutID<Pool>): Promise<true> {
 	// first insert the pool row
 	const poolData = [{ name: pool.name }];
 	const poolsQuery = await supabase.from('pools').insert(poolData).select().limit(1);
@@ -40,12 +43,15 @@ export async function createPool(pool: Pool): Promise<true> {
 	}
 
 	// insert tiers
-	const tierData = Object.entries(pool.tiers).map(([num, t]) => ({
-		pool_id,
-		tier_num: Number(num),
-		required_picks: t.required,
-		players: t.players
-	}));
+	const tierData = [];
+	for (const [num, t] of pool.tiers.entries()) {
+		tierData.push({
+			pool_id,
+			tier_num: Number(num),
+			required_picks: t.required,
+			players: t.players
+		});
+	}
 	const { error: tiersError } = await supabase.from('tiers').insert(tierData);
 	if (tiersError) {
 		console.error(tiersError);
@@ -53,6 +59,19 @@ export async function createPool(pool: Pool): Promise<true> {
 	}
 
 	return true;
+}
+
+/**
+ * Get pools
+ */
+export async function getPools(): Promise<Omit<Pool, 'tiers'>[]> {
+	const poolsQuery = await supabase.from('pools').select();
+
+	if (poolsQuery.error) {
+		throw new Error('failed to fetch pool info');
+	}
+
+	return poolsQuery.data;
 }
 
 /**
