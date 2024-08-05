@@ -1,4 +1,4 @@
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { error, fail, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { createEntry, getPoolById } from '$lib/api/pools';
 import { getPicks } from './utils';
@@ -16,7 +16,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 		};
 	} catch (err) {
 		console.error(err);
-		redirect(307, '/');
+		error(500, {
+			message: `there was an error fetching pool ${params.id}`,
+			error: err
+		} as App.Error);
 	}
 };
 
