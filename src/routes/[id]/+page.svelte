@@ -37,12 +37,21 @@
 <Button href="/" variant="outline">back</Button>
 <div class="my-6">
 	<h1>{data.name}</h1>
-	<p class="text-muted-foreground">{data.entries.length} entries in this pool</p>
 </div>
 
 <div>
-	<Button onclick={() => (view = 'pool')}>Pool Leaderboard</Button>
-	<Button onclick={() => (view = 'tournament')}>Tournament Leaderboard</Button>
+	<button
+		onclick={() => (view = 'pool')}
+		class={`h-7 rounded-full px-4 text-sm ${view !== 'pool' ? 'text-muted-foreground hover:text-primary' : 'bg-muted font-medium text-primary'}`}
+	>
+		Pool Leaderboard
+	</button>
+	<button
+		onclick={() => (view = 'tournament')}
+		class={`h-7 rounded-full px-4 text-sm ${view !== 'tournament' ? 'text-muted-foreground hover:text-primary' : 'bg-muted font-medium text-primary'}`}
+	>
+		Tournament Leaderboard
+	</button>
 </div>
 
 {#if view === 'pool'}

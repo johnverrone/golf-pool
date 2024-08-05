@@ -12,7 +12,6 @@
 <Button href="/" variant="outline">back</Button>
 <div class="my-6">
 	<h1>Create New Pool</h1>
-	<p class="text-muted-foreground">Setup a new pool.</p>
 </div>
 
 <form method="POST" action="?/createPool" use:enhance>
