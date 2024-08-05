@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 		const leaderboard = await getLeaderboard(fetch, data.espnId);
 		// TODO: don't return picks to client before first tee time
 		return {
-			title: 'Golf Pools',
+			title: data.name || 'Golf Pools',
 			leaderboard,
 			...data
 		};
