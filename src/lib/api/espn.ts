@@ -21,9 +21,13 @@ interface ESPNResponseType {
 	}[];
 }
 
-export async function getLeaderboard(f: typeof fetch): Promise<Leaderboard> {
+export async function getLeaderboard(
+	f: typeof fetch,
+	eventId?: string
+): Promise<Leaderboard | null> {
+	if (!eventId) return null;
 	const req = await f(
-		'https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/events/401580360?lang=en&region=us'
+		`https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/events/${eventId}?lang=en&region=us`
 	);
 	const data = (await req.json()) as ESPNResponseType;
 

@@ -11,10 +11,27 @@
 	let { data } = $props();
 	let open = $state(false);
 	let showPicks = $state(true);
+	let view = $state<'pool' | 'tournament'>('pool');
 
 	let pickColumns = $derived([
 		...Array(Math.max(0, ...data.entries.map((e) => e.picks?.length ?? 0))).keys()
 	]);
+
+	let scoreLookup = $derived(
+		data.leaderboard?.players.reduce<Map<string, number>>((acc, curr) => {
+			return acc.set(curr.name, curr.score);
+		}, new Map())
+	);
+
+	function getScore(picks: string[] | null): number {
+		if (!picks) return 0;
+		let score = 0;
+		for (const p of picks) {
+			const pickScore = scoreLookup?.get(p) ?? 0;
+			score += pickScore;
+		}
+		return score;
+	}
 </script>
 
 <Button href="/" variant="outline">back</Button>
@@ -23,43 +40,77 @@
 	<p class="text-muted-foreground">{data.entries.length} entries in this pool</p>
 </div>
 
-<div class="my-6">
-	<div class="flex justify-between">
-		<h3>Leaderboard</h3>
-		<div class="flex items-center space-x-2">
-			<Switch id="show-picks" bind:checked={showPicks} />
-			<Label for="show-picks">Show picks</Label>
-		</div>
-	</div>
-	<Table.Root class="table-fixed">
-		<Table.Header>
-			<Table.Row>
-				<Table.Head>Team Name</Table.Head>
-				<Table.Head>Name</Table.Head>
-				{#if pickColumns.length}
-					{#each pickColumns as column}
-						<Table.Head>Pick {column + 1}</Table.Head>
-					{/each}
-				{/if}
-			</Table.Row>
-		</Table.Header>
-		<Table.Body>
-			{#each data.entries as entry}
-				<Table.Row>
-					<Table.Cell class="font-medium">{entry.teamName}</Table.Cell>
-					<Table.Cell>{entry.name}</Table.Cell>
-					{#if entry.picks}
-						{#each entry.picks as pick}
-							<Table.Cell>{showPicks ? pick : `~~~~~~`}</Table.Cell>
-						{/each}
-					{/if}
-				</Table.Row>
-			{/each}
-		</Table.Body>
-	</Table.Root>
+<div>
+	<Button onclick={() => (view = 'pool')}>Pool Leaderboard</Button>
+	<Button onclick={() => (view = 'tournament')}>Tournament Leaderboard</Button>
 </div>
 
-<Button variant="outline" onclick={() => (open = true)}>Add Entry</Button>
+{#if view === 'pool'}
+	<div class="my-6 rounded-lg border p-8">
+		<div class="flex justify-between">
+			<h3 class="mb-4">Leaderboard</h3>
+			<div class="flex items-center space-x-2">
+				<Switch id="show-picks" bind:checked={showPicks} />
+				<Label for="show-picks">Show picks</Label>
+			</div>
+		</div>
+		<Table.Root class="table-fixed">
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Team Name</Table.Head>
+					<Table.Head>Name</Table.Head>
+					{#if pickColumns.length}
+						{#each pickColumns as column}
+							<Table.Head>Pick {column + 1}</Table.Head>
+						{/each}
+					{/if}
+					<Table.Head>Score</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each data.entries as entry}
+					<Table.Row>
+						<Table.Cell class="font-medium">{entry.teamName}</Table.Cell>
+						<Table.Cell>{entry.name}</Table.Cell>
+						{#if entry.picks}
+							{#each entry.picks as pick}
+								<Table.Cell>
+									{showPicks ? `${pick} (${scoreLookup?.get(pick)})` : `~~~~~~`}
+								</Table.Cell>
+							{/each}
+						{/if}
+						<Table.Cell>{showPicks ? getScore(entry.picks) : `~~~~~~`}</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+		<div class="my-6">
+			<Button variant="outline" onclick={() => (open = true)}>Add Entry</Button>
+		</div>
+	</div>
+{:else if view === 'tournament' && data.leaderboard}
+	<div class="my-6 rounded-lg border p-8">
+		<h3 class="mb-4">{data.leaderboard.name}</h3>
+
+		<Table.Root class="table-fixed">
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Player</Table.Head>
+					<Table.Head>Score</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each data.leaderboard.players as player}
+					<Table.Row>
+						<Table.Cell class="font-medium">{player.name}</Table.Cell>
+						<Table.Cell>{player.displayScore}</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+{/if}
+
 <Dialog.Root bind:open>
 	<Dialog.Trigger />
 

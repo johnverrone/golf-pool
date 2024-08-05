@@ -18,6 +18,7 @@ export type Pool = {
 	id: number;
 	name: string;
 	tiers: Map<number, Tier>;
+	espnId?: string;
 };
 
 export type PoolWithEntries = Pool & {
@@ -87,7 +88,9 @@ export async function getPoolById(id: string): Promise<PoolWithEntries> {
 	}
 
 	return {
-		...poolsQuery.data,
+		id: poolsQuery.data.id,
+		name: poolsQuery.data.name,
+		espnId: poolsQuery.data.espn_id ?? undefined,
 		entries: entriesQuery.data.map((d) => ({
 			name: d.name ?? '',
 			teamName: d.team_name,
