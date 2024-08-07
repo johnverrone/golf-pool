@@ -35,10 +35,10 @@ export async function getLeaderboard(
 		name: data.name,
 		players: await Promise.all(
 			data.competitions[0].competitors.map(async (c) => {
-				const athleteReq = await f(c.athlete['$ref']);
+				const athleteReq = await f(c.athlete['$ref'].replace('http://', 'https://'));
 				const athlete = await athleteReq.json();
 
-				const scoreReq = await f(c.score['$ref']);
+				const scoreReq = await f(c.score['$ref'].replace('http://', 'https://'));
 				const score = await scoreReq.json();
 
 				return {
