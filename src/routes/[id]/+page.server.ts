@@ -4,10 +4,18 @@ import { createEntry, getPoolById } from '$lib/api/pools';
 import { getPicks } from './utils';
 import { getLeaderboard } from '$lib/api/espn';
 
+async function tryLeaderboard(f: typeof fetch, espnId: string) {
+	try {
+		return await getLeaderboard(f, espnId);
+	} catch {
+		return null;
+	}
+}
+
 export const load: PageServerLoad = async ({ params, fetch }) => {
 	try {
 		const data = await getPoolById(params.id);
-		const leaderboard = await getLeaderboard(fetch, data.espnId);
+		const leaderboard = data.espnId ? await tryLeaderboard(fetch, data.espnId) : null;
 		// TODO: don't return picks to client before first tee time
 		return {
 			title: data.name || 'Golf Pools',

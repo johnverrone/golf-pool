@@ -7,6 +7,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
 	import * as Table from '$lib/components/ui/table';
+	import { getLeaderboard } from '$lib/api/espn.js';
 
 	let { data } = $props();
 	let open = $state(false);
@@ -22,6 +23,19 @@
 			return acc.set(curr.name, curr.score);
 		}, new Map())
 	);
+
+	// Cloudflare pages have a limit of 50 subrequests so
+	// this is a workaround to make requests to ESPN client side
+	// if the server returned null
+	let leaderboard = $state(data.leaderboard);
+	$effect(() => {
+		async function fetchLeaderboard() {
+			leaderboard = data.espnId ? await getLeaderboard(fetch, data.espnId) : null;
+		}
+		if (!leaderboard) {
+			fetchLeaderboard();
+		}
+	});
 
 	function getScore(picks: string[] | null): number {
 		if (!picks) return 0;
@@ -97,9 +111,9 @@
 			<Button variant="outline" onclick={() => (open = true)}>Add Entry</Button>
 		</div>
 	</div>
-{:else if view === 'tournament' && data.leaderboard}
+{:else if view === 'tournament' && leaderboard}
 	<div class="my-6 rounded-lg border p-8">
-		<h3 class="mb-4">{data.leaderboard.name}</h3>
+		<h3 class="mb-4">{leaderboard.name}</h3>
 
 		<Table.Root class="table-fixed">
 			<Table.Header>
@@ -109,7 +123,7 @@
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each data.leaderboard.players as player}
+				{#each leaderboard.players as player}
 					<Table.Row>
 						<Table.Cell class="font-medium">{player.name}</Table.Cell>
 						<Table.Cell>{player.displayScore}</Table.Cell>
